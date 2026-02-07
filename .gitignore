@@ -1,3 +1,5 @@
+#DATA
+data/
 # Python-generated files
 __pycache__/
 *.py[oc]
@@ -8,3 +10,6 @@ wheels/
 
 # Virtual environments
 .venv
+
+# Env vars
+.env
