@@ -1,4 +1,4 @@
-from lib.search_utils import load_movies
+from lib.search_utils import load_movies, load_stopwords
 import string
 
 def clean_text(text):
@@ -8,8 +8,17 @@ def clean_text(text):
 
 def tokenize_text(text):
     text = clean_text(text)
-    tokens = [tok for tok in text.split() if tok]
-    return tokens
+    stopwords = load_stopwords()
+    res = []
+    def _filter(tok):
+        tok = tok.strip('\n')
+        if tok and tok not in stopwords:
+            return True
+        return False
+    for tok in text.split():
+        if _filter(tok):
+            res.append(tok)
+    return res
 
 def has_matching_token(query_tokens,movie_tokens):
     for query_tok in query_tokens:
