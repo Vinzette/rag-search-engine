@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from lib.keyword_search import (search_command, build_command, tf_command, idf_command) 
+from lib.keyword_search import (search_command, build_command, tf_command, idf_command, tfidf_command) 
 import argparse
 
 
@@ -19,6 +19,10 @@ def main() -> None:
     search_parser = subparsers.add_parser("idf", help="Calculate IDF")
     search_parser.add_argument("term", type=str, help="Search term to find ID for")
 
+    search_parser = subparsers.add_parser("tfidf", help="Calculate TF-IDF")
+    search_parser.add_argument("doc_id", type=int, help="Doc ID for check")
+    search_parser.add_argument("term", type=str, help="Search term to find TF-IDF for")
+
 
     args = parser.parse_args()
 
@@ -35,6 +39,8 @@ def main() -> None:
             tf_command(args.doc_id, args.term)
         case "idf":
             idf_command(args.term)
+        case "tfidf":
+            tfidf_command(args.doc_id, args.term)
             
         case _:
             parser.print_help()
