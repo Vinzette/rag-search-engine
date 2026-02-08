@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from lib.keyword_search import (search_command, build_command, tf_command) 
+from lib.keyword_search import (search_command, build_command, tf_command, idf_command) 
 import argparse
 
 
@@ -12,10 +12,13 @@ def main() -> None:
     
     search_parser = subparsers.add_parser("build", help="Build pkl file")
 
-    search_parser = subparsers.add_parser("tf", help="Search using TF")
+    search_parser = subparsers.add_parser("tf", help="Calculate TF")
     search_parser.add_argument("doc_id", type=int, help="Doc ID for check")
     search_parser.add_argument("term", type=str, help="Search term to find counts for")
     
+    search_parser = subparsers.add_parser("idf", help="Calculate IDF")
+    search_parser.add_argument("term", type=str, help="Search term to find ID for")
+
 
     args = parser.parse_args()
 
@@ -30,6 +33,8 @@ def main() -> None:
             build_command()
         case "tf":
             tf_command(args.doc_id, args.term)
+        case "idf":
+            idf_command(args.term)
             
         case _:
             parser.print_help()
