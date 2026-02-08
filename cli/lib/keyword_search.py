@@ -41,9 +41,7 @@ def build_command():
     docs.save()
     doc_ids = docs.get_doc("merida")
     if doc_ids:
-        first_doc_id = doc_ids[0]
-        movie = docs.docmap[first_doc_id]
-        print(f"First document for token 'merida' = {movie}")
+        print(f"First document for token 'merida' = {doc_ids}")
 
 def clean_text(text):
     text = text.lower()

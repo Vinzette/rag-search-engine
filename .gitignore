@@ -13,3 +13,6 @@ wheels/
 
 # Env vars
 .env
+
+#
+cache/
