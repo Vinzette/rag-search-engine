@@ -31,11 +31,9 @@ class InvertedIndex:
         return self.term_frequencies[doc_id][token[0]]
     
     def get_bm25_tf(self, doc_id, term, k1=BM25_K1):
-        token = tokenize_text(term)
-        if len(token) !=1:
-            raise ValueError("Can only have 1 token")
+        tf = self.get_tf(doc_id, term)
+        return(tf * (k1 + 1)) / (tf + k1)
 
-    
     def get_bm25_idf(self,term):
         token = tokenize_text(term)
         if len(token) !=1:
@@ -90,6 +88,13 @@ def tf_command(doc_id, term):
     idx = InvertedIndex()
     idx.load()
     print(idx.get_tf(doc_id, term))
+
+def bm_25_tf_command(doc_id, term, k1):
+    idx = InvertedIndex()
+    idx.load()
+    bm25tf = idx.get_bm25_tf(doc_id, term, k1)
+    print(f"BM25 TF score of '{term}' in document '{doc_id}': {bm25tf:.2f}")
+
 
 def bm25_idf_command(term):
     idx = InvertedIndex()
