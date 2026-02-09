@@ -77,7 +77,37 @@ class InvertedIndex:
         idf = self.get_idf(term)
         return tf*idf
     
+    def get_bm25(self, doc_id, term):
+        tf = self.get_bm25_tf(doc_id, term)
+        idf = self.get_bm25_idf(term)
+        return tf*idf
     
+    def bm25_search(self, query, limit=5):
+        query_tokens = tokenize_text(query)
+        scores={}
+        for doc_id in self.docmap: #go through each document
+            score = 0
+            for token in query_tokens: #for each doc we go thru each token in the query, get the bm25 score and add it to the total score for that document
+                score += self.get_bm25(doc_id, token)
+            scores[doc_id] = score 
+        sorted_scores = sorted(scores.items(), #sort the scores in descending order of score, so we get the most relevant documents at the top
+                               key = lambda x: x[1], #x is a tuple of (doc_id, score), we want to sort by score which is the second element of the tuple, hence x[1]
+                               reverse=True) #to sort in desc order
+        results = sorted_scores[:limit] #get the top n results based on the limit
+        
+        format_results = [] #format the results to include the doc_id, title and score for each result, we can use this to display the results in a more user friendly way
+        for doc_id, score in results:
+            title = self.docmap[doc_id]['title']
+            format_results.append(
+                {
+                    "doc_id": doc_id,
+                    "title": title,
+                    "score": score
+                }
+            )
+        return format_results
+
+
 
     def build(self):
         movies = load_movies()
@@ -125,6 +155,12 @@ def bm25_idf_command(term):
     idx.load()
     bm25idf = idx.get_bm25_idf(term)
     print(f"BM25 IDF score of '{term}': {bm25idf:.2f}")
+
+def bm25_search(query, limit):
+    idx = InvertedIndex()
+    idx.load()
+    return idx.bm25_search(query, limit)
+
 
 def idf_command(term):
     idx = InvertedIndex()
