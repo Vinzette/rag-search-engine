@@ -1,4 +1,4 @@
-from lib.search_utils import load_movies, load_stopwords, CACHE_PATH
+from lib.search_utils import load_movies, load_stopwords, CACHE_PATH, BM25_K1
 import string
 from nltk.stem import PorterStemmer
 from collections import defaultdict, Counter
@@ -30,6 +30,12 @@ class InvertedIndex:
             raise ValueError("Can only have 1 token")
         return self.term_frequencies[doc_id][token[0]]
     
+    def get_bm25_tf(self, doc_id, term, k1=BM25_K1):
+        token = tokenize_text(term)
+        if len(token) !=1:
+            raise ValueError("Can only have 1 token")
+
+    
     def get_bm25_idf(self,term):
         token = tokenize_text(term)
         if len(token) !=1:
@@ -38,7 +44,6 @@ class InvertedIndex:
         doc_count = len(self.docmap)
         term_match_doc_count = len(self.index[token])
         return math.log((doc_count - term_match_doc_count + 0.5) / (term_match_doc_count + 0.5)+1)
-
     
     def get_idf(self, term):
         token = tokenize_text(term)
