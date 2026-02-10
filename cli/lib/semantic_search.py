@@ -1,4 +1,8 @@
 from sentence_transformers import SentenceTransformer
+from dotenv import load_dotenv
+
+load_dotenv()
+
 
 class SemanticSearch:
     def __init__(self):
