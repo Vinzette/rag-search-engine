@@ -13,6 +13,11 @@ class SemanticSearch:
         self.embeddings = None
         self.documents = None
         self.document_map = {}
+        # self.documents: A list of movie dictionaries (id, title, description) 
+        # where the index matches the order of the vectors in self.embeddings.
+
+        # self.document_map: A dictionary that maps movie IDs to their movie 
+        # data for fast lookups when you only have a specific ID.
         self.embeddings_path = Path("cache/movie_embeddings.npy")
     
     def build_embeddings(self, documents):
@@ -41,9 +46,50 @@ class SemanticSearch:
     def generate_embedding(self, text):
         if not text or not text.strip():
             raise ValueError("Must have text to create an embedding")
-        return self.model.encode([text])[0]
+        return self.model.encode([text])[0] #encode method expects a list of inputs, but we're only passing in one, so we wrap it in a list. It also returns a corresponding list as output, but we only care about the first element because we're only passing in one input.
     
-            
+    def search(self, query, limit):
+        if self.embeddings is None:
+            raise ValueError("No embeddings loaded. Call `load_or_create_embeddings` first.")
+        qry_emb = self.generate_embedding(query)
+
+        similarities = []
+        for doc_emb, doc in zip(self.embeddings, self.documents):
+            _similarity = cosine_similarity(qry_emb, doc_emb)
+            similarities.append((_similarity, doc))
+        similarities.sort(key=lambda x: x[0], reverse=True)
+        res = []
+        for sc, doc in similarities[:limit]:
+            res.append({'score':sc, 
+                        'title':doc['title'], 
+                        'description':doc['description']})
+        return res
+    
+def search(query, limit=5):
+    ss = SemanticSearch()
+    movies = load_movies()
+    ss.load_or_create_embeddings(movies)
+    search_results = ss.search(query, limit)
+    for idx, res in enumerate(search_results):
+        print(f"{idx}. {res['title']} (score: {res['score']:.4f})")
+        print(res['description'][:100])
+
+def cosine_similarity(vec1, vec2):
+    dot_product = np.dot(vec1, vec2)
+    norm1 = np.linalg.norm(vec1)
+    norm2 = np.linalg.norm(vec2)
+
+    if norm1 == 0 or norm2 == 0:
+        return 0.0
+
+    return dot_product / (norm1 * norm2)
+
+def embed_query_text(query):
+    ss = SemanticSearch()
+    embedding = ss.generate_embedding(query)
+    print(f"Query: {query}")
+    print(f"First 5 dimensions: {embedding[:5]}")
+    print(f"Shape: {embedding.shape}")         
 
 def verify_model():
     ss = SemanticSearch()
