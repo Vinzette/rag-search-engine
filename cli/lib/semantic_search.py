@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 import numpy as np
 from pathlib import Path
 from lib.search_utils import load_movies
+import re
 
 load_dotenv()
 
@@ -65,7 +66,24 @@ class SemanticSearch:
                         'description':doc['description']})
         return res
     
-def fixed_sized_chunking(text, overlap, chunk_size=200):
+def semantic_chunking(text, max_chunk_size=4, overlap=0):
+    sentences = re.split(r"(?<=[.!?])\s+", text)
+    chunks = []
+    step_size = max_chunk_size - overlap
+    for i in range(0, len(sentences), step_size):
+        chunk_sentences = sentences[i:i+max_chunk_size]
+        if len(chunk_sentences) <= overlap:
+            break
+        chunks.append(" ".join(chunk_sentences))
+    return chunks
+
+def chunk_text_semantic(text, max_chunk_size=4, overlap=0):
+    chunks = semantic_chunking(text, max_chunk_size, overlap)
+    print(f"Semantically chunking {len(text)} characters")
+    for i, chunk in enumerate(chunks):
+        print(f"{i+1}. {chunk}")
+
+def fixed_sized_chunking(text, overlap=0, chunk_size=200):
     words = text.split()
     chunks = []
     step_size = chunk_size - overlap
@@ -76,7 +94,7 @@ def fixed_sized_chunking(text, overlap, chunk_size=200):
         chunks.append(" ".join(chunk_words))
     return chunks
 
-def chunk_text(text, overlap, chunk_size=200):
+def chunk_text(text, overlap=0, chunk_size=200):
     chunks = fixed_sized_chunking(text, overlap, chunk_size)
     print(f"Chunking {len(text)} characters")
     for i, chunk in enumerate(chunks):

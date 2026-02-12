@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
-from lib.semantic_search import (verify_model, embed_text, verify_embeddings, embed_query_text, search, chunk_text)
+from lib.semantic_search import (verify_model, embed_text, verify_embeddings, embed_query_text, search, chunk_text, chunk_text_semantic)
 
 def main():
     parser = argparse.ArgumentParser(description="Semantic Search CLI")
@@ -25,11 +25,19 @@ def main():
     chunk_parser.add_argument("text", type=str, help="Document to be chunked")
     chunk_parser.add_argument("--overlap", type=int, help="Document to be chunked")
     chunk_parser.add_argument("--chunk-size", type=int, default=200, help="Number of words in each fixed size")
+
+    semantic_chunk_parser = subparsers.add_parser("semantic_chunk", help="Chunk a document semantically")
+    semantic_chunk_parser.add_argument("text", type=str, help="Document to be chunked")
+    semantic_chunk_parser.add_argument("--overlap", type=int, default=0, help="Number of sentences in each fixed size chunk")
+    semantic_chunk_parser.add_argument("--max-chunk-size", type=int, default=4, help="Number of sentences in each fixed size")
     
 
     args = parser.parse_args()
 
     match args.command:
+        case "semantic_chunk":
+            chunk_text_semantic(args.text, args.max_chunk_size, args.overlap)
+
         case "chunk":
             chunk_text(args.text, args.overlap, args.chunk_size)
 
