@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
-from lib.semantic_search import (verify_model, embed_text, verify_embeddings, embed_query_text, search)
+from lib.semantic_search import (verify_model, embed_text, verify_embeddings, embed_query_text, search, chunk_text)
 
 def main():
     parser = argparse.ArgumentParser(description="Semantic Search CLI")
@@ -21,9 +21,16 @@ def main():
     search_parser.add_argument("query", type=str, help="User query to search based on")
     search_parser.add_argument("--limit", type=int, default=5, help="Number of results returned")
 
+    chunk_parser = subparsers.add_parser("chunk", help="Chunk a document")
+    chunk_parser.add_argument("text", type=str, help="Document to be chunked")
+    chunk_parser.add_argument("--chunk-size", type=int, default=200, help="Number of words in each fixed size")
+
     args = parser.parse_args()
 
     match args.command:
+        case "chunk":
+            chunk_text(args.text, args.chunk_size)
+
         case "search":
             search(args.query, args.limit)
 
