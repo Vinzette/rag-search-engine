@@ -65,15 +65,19 @@ class SemanticSearch:
                         'description':doc['description']})
         return res
     
-def fixed_sized_chunking(text, chunk_size=200):
+def fixed_sized_chunking(text, overlap, chunk_size=200):
     words = text.split()
     chunks = []
-    for i in range(0, len(words), chunk_size): #it will go from 0 to whatever the chunk size is
-        chunks.append(" ".join(words[i:i+chunk_size]))
+    step_size = chunk_size - overlap
+    for i in range(0, len(words), step_size): #it will go from 0 to whatever the chunk size is
+        chunk_words = words[i:i+chunk_size]
+        if len(chunk_words) <= overlap: #if last chunk is smaller than the overlap, we can just break
+            break
+        chunks.append(" ".join(chunk_words))
     return chunks
 
-def chunk_text(text, chunk_size=200):
-    chunks = fixed_sized_chunking(text, chunk_size)
+def chunk_text(text, overlap, chunk_size=200):
+    chunks = fixed_sized_chunking(text, overlap, chunk_size)
     print(f"Chunking {len(text)} characters")
     for i, chunk in enumerate(chunks):
         print(f"{i+1}. {chunk}")
