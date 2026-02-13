@@ -97,7 +97,6 @@ class ChunkedSemanticSearch(SemanticSearch):
             json.dump({"chunks": chunk_metadata, "total_chunks": len(all_chunks)}, f, indent=2)
         return self.chunk_embeddings
 
-
     def load_or_create_chunk_embeddings(self, documents: list[dict]) -> np.ndarray:
         self.documents = documents
         self.document_map = {doc['id']: doc for doc in documents}
