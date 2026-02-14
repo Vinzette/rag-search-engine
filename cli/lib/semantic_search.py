@@ -5,6 +5,7 @@ from pathlib import Path
 from lib.search_utils import load_movies
 import re
 import json
+from collections import defaultdict
 
 load_dotenv()
 
@@ -91,7 +92,7 @@ class ChunkedSemanticSearch(SemanticSearch):
                 chunk_metadata.append({"movie_idx": midx, "chunk_idx": cidx,  "total_chunks": len(_chunks) })
         self.chunk_embeddings = self.model.encode(all_chunks, show_progress_bar=True)
         self.chunk_metadata = chunk_metadata
-
+        self.chunk_embeddings_path.parent.mkdir(parents = True, exist_ok=True) #make sure the cache directory exists before we try to save the file, if it doesn't exist, it will create it. parents=True allows it to create any necessary parent directories as well, and exist_ok=True means that if the directory already exists, it won't raise an error.
         np.save(self.chunk_embeddings_path, self.chunk_embeddings)
         with open(self.chunk_metadata_path, 'w') as f:
             json.dump({"chunks": chunk_metadata, "total_chunks": len(all_chunks)}, f, indent=2)
@@ -107,6 +108,41 @@ class ChunkedSemanticSearch(SemanticSearch):
                 self.chunk_metadata = json.load(f)
             return self.chunk_embeddings
         return self.build_chunk_embeddings(documents)
+    
+    def search_chunks(self, query: str, limit: int = 10):
+        query_emb = self.generate_embedding(query)
+        chunk_scores = []
+        movie_scores = defaultdict(lambda: 0) #lambda is just a way to create a default value for any key that doesn't exist in the dictionary, in this case we want the default score to be 0, so if we try to access a key that hasn't been added to the movie_scores dictionary yet, it will return 0 instead of throwing an error. This is useful because when we calculate the similarity score for each chunk, we want to keep track of the highest score for each movie, and if we haven't seen that movie before, we want its initial score to be 0. 
+        for idx in range(len(self.chunk_embeddings)):
+            chunk_embedding = self.chunk_embeddings[idx]
+            metadata = self.chunk_metadata['chunks'][idx]
+            midx, cidx = metadata['movie_idx'], metadata['chunk_idx']
+            sim = cosine_similarity(query_emb, chunk_embedding)
+            chunk_scores.append({
+                'movie_idx': midx,
+                'chunk_idx': cidx,
+                'score': sim})
+            movie_scores[midx] = max(movie_scores[midx], sim)
+        movie_scores_sorted = sorted(movie_scores.items(), key=lambda x: x[1], reverse=True) #changes dict into tuples, [1:2] --> [(1,2)] then  we can sort 
+        res = []
+        for midx, score in movie_scores_sorted[:limit]:
+            doc = self.documents[midx]
+            res.append({
+                "id": doc['id'],
+                "title": doc['title'],
+                "document": doc['description'][:100],
+                "score": round(score, 4),
+                "metadata": {}})
+        return res
+
+def search_chunked(query, limit=5):
+    css = ChunkedSemanticSearch()
+    movies = load_movies()
+    _ = css.load_or_create_chunk_embeddings(movies)
+    results = css.search_chunks(query, limit)
+    for i, res in enumerate(results):
+        print(f"\n{i+1}. {res['title']} (score: {res['score']:.4f})")
+        print(f"   {res['document']}...")
 
 def embed_chunks():
     movies = load_movies()
