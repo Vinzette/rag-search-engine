@@ -1,5 +1,5 @@
 import os
-
+from lib.llm import correct_spelling
 from .keyword_search import InvertedIndex
 from .semantic_search import ChunkedSemanticSearch
 from lib.search_utils import load_movies
@@ -32,12 +32,18 @@ class HybridSearch:
         return combined_results
 
     
-def rrf_search(query, k=60, limit=5):
+def rrf_search(query, k=60, limit=5, enhance=None):
      movies = load_movies()
      hs = HybridSearch(movies)
      results = hs.rrf_search(query, k, limit)
+     match enhance:
+          case "spell":
+               new_query=correct_spelling(query)
+               print(f"Enhanced query (spell): '{query}' -> '{new_query}'\n")
+               query = new_query
+     results = hs.rrf_search(query, k, limit)
      for idx, r in enumerate(results[:limit], start =1):
-           print(f"{idx} {r['title']}")
+           print(f"{idx}. {r['title']}")
            print(f"RRF Score Score: {r['rrf_score']}")
            print(f"BM25 Rank: {r['bm25_rank']}, Semantic Rank: {r['sem_rank']}")
            print(r['description'][:100])
