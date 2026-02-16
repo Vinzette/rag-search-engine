@@ -14,6 +14,10 @@ print("Using GEMINI_API_KEY from environment")
 model='gemini-2.5-flash'
 client = genai.Client(api_key=api_key)
 
+def augument_prompt(query, type):
+    with open(PROMPT_PATH/f'{type}.md', 'r') as f:
+        prompt = f.read()
+    return  generate_content(prompt, query)
 
 def generate_content(prompt, query):
     prompt = prompt.format(query=query)
@@ -21,19 +25,13 @@ def generate_content(prompt, query):
     return response.text
 
 def correct_spelling(query):
-    with open(PROMPT_PATH/'spelling.md', 'r') as f:
-        prompt = f.read()
-    return  generate_content(prompt, query)
+    return augument_prompt(query, 'spelling')
 
 def rewrite_query(query):
-    with open(PROMPT_PATH/'rewrite.md', 'r') as f:
-        prompt = f.read()
-    return generate_content(prompt, query)
+    return augument_prompt(query, 'rewrite')
 
 def expand_query(query):
-    with open(PROMPT_PATH/'expand.md', 'r') as f:
-        prompt = f.read()
-    return generate_content(prompt, query)
+    return augument_prompt(query, 'expand')
 
 
     

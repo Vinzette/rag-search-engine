@@ -1,5 +1,5 @@
 import os
-from lib.llm import correct_spelling, rewrite_query, expand_query
+from lib.llm import augument_prompt
 from .keyword_search import InvertedIndex
 from .semantic_search import ChunkedSemanticSearch
 from lib.search_utils import load_movies
@@ -35,21 +35,11 @@ class HybridSearch:
 def rrf_search(query, k=60, limit=5, enhance=None):
      movies = load_movies()
      hs = HybridSearch(movies)
-     results = hs.rrf_search(query, k, limit)
-     match enhance:
-          case "spell":
-               new_query=correct_spelling(query)
-               print(f"Enhanced query (spell): '{query}' -> '{new_query}'\n")
-               query = new_query
-          case "rewrite":
-               new_query = rewrite_query(query)
-               print(f"Enhanced query (rewrite): '{query}' -> '{new_query}'\n")
-               query = new_query
-          case "expand":
-               new_query = expand_query(query)
-               print(f"Enhanced query (expand): '{query}' -> '{new_query}'\n")
-               query = new_query 
-
+     if enhance:
+          new_query = augument_prompt(query, enhance)
+          print(f"Enhanced query ({enhance}): '{query}' -> '{new_query}'\n")
+          query = new_query
+      
      results = hs.rrf_search(query, k, limit)
      for idx, r in enumerate(results[:limit], start =1):
            print(f"{idx}. {r['title']}")
