@@ -21,12 +21,12 @@ def individual_rerank(query, documents):
             query=query, 
             title=doc['title'], 
             description=doc['description'])
-        #response = client.models.generate_content(model=model, contents=_prompt)
-        try:
-            response = client.models.generate_content(model=model, contents=_prompt)
-        except Exception:
-            results.append({**doc, "rerank_response": 0})
-            continue
+        response = client.models.generate_content(model=model, contents=_prompt)
+        # try:
+        #     response = client.models.generate_content(model=model, contents=_prompt)
+        # except Exception:
+        #     results.append({**doc, "rerank_response": 0})
+        #     continue
 
         clean_response_text = (response.text or "").strip()
         try:

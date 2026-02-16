@@ -40,8 +40,7 @@ def rrf_search(query, k=60, limit=5, enhance=None, rerank_method=None):
           new_query = augment_prompt(query, enhance)
           print(f"Enhanced query ({enhance}): '{query}' -> '{new_query}'\n")
           query = new_query
-     # rrf_limit = limit * 5 if rerank_method else 5
-     rrf_limit = limit
+     rrf_limit = limit * 5 if rerank_method else 5
 
      results = hs.rrf_search(query, k, rrf_limit)
      if rerank_method:
