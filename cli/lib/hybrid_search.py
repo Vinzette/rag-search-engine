@@ -1,5 +1,6 @@
 import os
-from lib.llm import augument_prompt
+from lib.llm import augment_prompt
+from lib.rerank import individual_rerank
 from .keyword_search import InvertedIndex
 from .semantic_search import ChunkedSemanticSearch
 from lib.search_utils import load_movies
@@ -29,21 +30,29 @@ class HybridSearch:
         bm25_results = self._bm25_search(query, limit*500)
         sem_results = self.semantic_search.search_chunks(query, limit*500) #cutting computation by searching not all docs
         combined_results = rrf_combine_search_results(bm25_results, sem_results, k)
-        return combined_results
+        return combined_results[:limit]
 
     
-def rrf_search(query, k=60, limit=5, enhance=None):
+def rrf_search(query, k=60, limit=5, enhance=None, rerank_method=None):
      movies = load_movies()
      hs = HybridSearch(movies)
      if enhance:
-          new_query = augument_prompt(query, enhance)
+          new_query = augment_prompt(query, enhance)
           print(f"Enhanced query ({enhance}): '{query}' -> '{new_query}'\n")
           query = new_query
-      
-     results = hs.rrf_search(query, k, limit)
+     # rrf_limit = limit * 5 if rerank_method else 5
+     rrf_limit = limit
+
+     results = hs.rrf_search(query, k, rrf_limit)
+     if rerank_method:
+          results = individual_rerank(query, results) #take in query and previous results
+          print(f"Reranking top {limit} results using individual method...")
+
+
+
      for idx, r in enumerate(results[:limit], start =1):
            print(f"{idx}. {r['title']}")
-           print(f"RRF Score Score: {r['rrf_score']}")
+           print(f"RRF Score: {r['rrf_score']}")
            print(f"BM25 Rank: {r['bm25_rank']}, Semantic Rank: {r['sem_rank']}")
            print(r['description'][:100])
 
