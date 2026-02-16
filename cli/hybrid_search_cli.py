@@ -18,7 +18,7 @@ def main() -> None:
     rrf_parser.add_argument("query", type=str, help="User query to find relevant docs for")
     rrf_parser.add_argument("--k", type=int, default =60, help="k hyperparam for rrf")
     rrf_parser.add_argument("--limit", type=int, default = 5, help="number of results to return")
-    rrf_parser.add_argument("--enhance", type=str, choices=["spell"], help="Query enhancement method")
+    rrf_parser.add_argument("--enhance", type=str, choices=["spell","rewrite"], help="Query enhancement method")
 
     args = parser.parse_args()
 

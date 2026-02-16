@@ -25,5 +25,10 @@ def correct_spelling(query):
         prompt = f.read()
     return  generate_content(prompt, query)
 
+def rewrite_query(query):
+    with open(PROMPT_PATH/'rewrite.md', 'r') as f:
+        prompt = f.read()
+    return generate_content(prompt, query)
+
 
     
