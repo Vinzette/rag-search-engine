@@ -4,7 +4,10 @@ from google import genai
 
 load_dotenv()
 api_key = os.environ.get("GEMINI_API_KEY")
-print(f"Using key {api_key[:6]}...")
+if not api_key:
+    raise RuntimeError("GEMINI_API_KEY is not set")
+
+print("Using GEMINI_API_KEY from environment")
 
 
 model='gemini-2.5-flash'
