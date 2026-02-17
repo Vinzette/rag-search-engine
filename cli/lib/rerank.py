@@ -2,6 +2,7 @@ import os
 import json
 from dotenv import load_dotenv
 from google import genai
+from sentence_transformers import CrossEncoder
 from lib.search_utils import PROMPT_PATH
 
 load_dotenv()
@@ -59,4 +60,17 @@ def batch_rerank(query, documents):
     for idx, doc in enumerate(documents):
         results.append({**doc, 'rerank_score':response_parsed.index(idx)}) #This looks up WHERE the current ID sits in the AI's preferred list, so first doc is highest rated
     results = sorted(results, key = lambda x: x['rerank_score'], reverse=False)
+    return results
+
+def cross_encoder_rerank(query,documents):
+    pairs = []
+    for doc in documents:
+        pairs.append([query, f"{doc.get('title', '')} - {doc.get('document', '')}"])
+    cross_encoder = CrossEncoder("cross-encoder/ms-marco-TinyBERT-L2-v2")
+    #scores is a list of numbers, one for each pair
+    scores = cross_encoder.predict(pairs)
+    results = []
+    for idx, doc in enumerate(documents):
+        results.append({**doc, 'cross_encoder_score': scores[idx]})
+    results = sorted(results, key=lambda x: x['cross_encoder_score'], reverse=True)
     return results
