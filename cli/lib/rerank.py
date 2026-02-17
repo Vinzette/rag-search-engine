@@ -1,5 +1,5 @@
 import os
-import time
+import json
 from dotenv import load_dotenv
 from google import genai
 from lib.search_utils import PROMPT_PATH
@@ -40,4 +40,23 @@ def individual_rerank(query, documents):
         #     print((clean_response_text,response.text, query, doc['description'][:100]))
         #     raise e
     results = sorted(results, key=lambda x: x['rerank_response'], reverse=True)
+    return results
+
+def batch_rerank(query, documents):
+    with open(PROMPT_PATH/'batch_rerank.md', 'r') as f:
+        prompt = f.read()
+    _mtemp= '''<movie id={idx}=>{title}:\n{desc}\n</movie>\n'''
+    doc_list_str =''
+    for idx,doc in enumerate(documents):
+        doc_list_str+= _mtemp.format(idx = idx,title=doc['title'], desc=doc['description'])
+    _prompt = prompt.format(
+        query = query,
+        doc_list_str=doc_list_str)
+    response = client.models.generate_content(model=model, contents=_prompt)
+    print(response.text)
+    response_parsed = json.loads(response.text.strip('```json').strip('```').strip())
+    results =[]
+    for idx, doc in enumerate(documents):
+        results.append({**doc, 'rerank_score':response_parsed.index(idx)})
+    results = sorted(results, key = lambda x: x['rerank_score'], reverse=False)
     return results

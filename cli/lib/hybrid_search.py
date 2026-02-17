@@ -1,6 +1,6 @@
 import os
 from lib.llm import augment_prompt
-from lib.rerank import individual_rerank
+from lib.rerank import individual_rerank, batch_rerank
 from .keyword_search import InvertedIndex
 from .semantic_search import ChunkedSemanticSearch
 from lib.search_utils import load_movies
@@ -43,11 +43,15 @@ def rrf_search(query, k=60, limit=5, enhance=None, rerank_method=None):
      rrf_limit = limit * 5 if rerank_method else 5
 
      results = hs.rrf_search(query, k, rrf_limit)
-     if rerank_method:
-          results = individual_rerank(query, results) #take in query and previous results
-          print(f"Reranking top {limit} results using individual method...")
-
-
+     match rerank_method:
+          case "individual":
+               results = individual_rerank(query, results) #take in query and previous results
+               print(f"Reranking top {limit} results using individual method...")
+          case "batch":
+               results = batch_rerank(query, results)
+               print(f"Reranking top {limit} results using batch method...")
+          case _:
+               pass
 
      for idx, r in enumerate(results[:limit], start =1):
            print(f"{idx}. {r['title']}")
