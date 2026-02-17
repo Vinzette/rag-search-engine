@@ -43,20 +43,20 @@ def individual_rerank(query, documents):
     return results
 
 def batch_rerank(query, documents):
-    with open(PROMPT_PATH/'batch_rerank.md', 'r') as f:
+    with open(PROMPT_PATH/'batch_rerank.md', 'r') as f: #Reads a prompt template
         prompt = f.read()
-    _mtemp= '''<movie id={idx}=>{title}:\n{desc}\n</movie>\n'''
+    _mtemp= '''<movie id={idx}=>{title}:\n{desc}\n</movie>\n''' #Converts each document into a tagged text block, This defines a schema.
     doc_list_str =''
     for idx,doc in enumerate(documents):
-        doc_list_str+= _mtemp.format(idx = idx,title=doc['title'], desc=doc['description'])
+        doc_list_str+= _mtemp.format(idx = idx,title=doc['title'], desc=doc['description']) #loop iterates through documents and appends stuff
     _prompt = prompt.format(
         query = query,
         doc_list_str=doc_list_str)
     response = client.models.generate_content(model=model, contents=_prompt)
     print(response.text)
-    response_parsed = json.loads(response.text.strip('```json').strip('```').strip())
+    response_parsed = json.loads(response.text.strip('```json').strip('```').strip()) #clean up AI response
     results =[]
     for idx, doc in enumerate(documents):
-        results.append({**doc, 'rerank_score':response_parsed.index(idx)})
+        results.append({**doc, 'rerank_score':response_parsed.index(idx)}) #This looks up WHERE the current ID sits in the AI's preferred list, so first doc is highest rated
     results = sorted(results, key = lambda x: x['rerank_score'], reverse=False)
     return results
