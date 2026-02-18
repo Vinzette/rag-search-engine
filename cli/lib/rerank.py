@@ -54,7 +54,7 @@ def batch_rerank(query, documents):
         query = query,
         doc_list_str=doc_list_str)
     response = client.models.generate_content(model=model, contents=_prompt)
-    print(response.text)
+    # print(response.text)
     response_parsed = json.loads(response.text.strip('```json').strip('```').strip()) #clean up AI response
     results =[]
     for idx, doc in enumerate(documents):

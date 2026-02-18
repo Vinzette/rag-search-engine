@@ -1,0 +1,106 @@
+{
+  "test_cases": [
+    {
+      "query": "cute british bear marmalade",
+      "relevant_docs": ["Paddington"]
+    },
+    {
+      "query": "talking teddy bear comedy",
+      "relevant_docs": ["Ted", "Ted 2"]
+    },
+    {
+      "query": "children's animated bear adventure",
+      "relevant_docs": [
+        "Brother Bear",
+        "The Jungle Book",
+        "The Many Adventures of Winnie the Pooh",
+        "Yogi Bear",
+        "The Care Bears Movie",
+        "Care Bears Movie II: A New Generation",
+        "Care Bears Nutcracker Suite",
+        "The Little Polar Bear",
+        "The Little Polar Bear 2: The Mysterious Island",
+        "Open Season",
+        "The Country Bears",
+        "The Berenstain Bears' Christmas Tree",
+        "Winnie the Pooh"
+      ]
+    },
+    {
+      "query": "friendship transformation magic with bears",
+      "relevant_docs": [
+        "Brother Bear",
+        "The Care Bears Movie",
+        "The Jungle Book"
+      ]
+    },
+    {
+      "query": "dinosaur park",
+      "relevant_docs": ["Jurassic Park"]
+    },
+    {
+      "query": "wizards and magic",
+      "relevant_docs": [
+        "Harry Potter and the Sorcerer's Stone",
+        "Harry Potter and the Prisoner of Azkaban",
+        "Harry Potter and the Goblet of Fire",
+        "Harry Potter and the Order of the Phoenix",
+        "Harry Potter and the Deathly Hallows: Part 1",
+        "Harry Potter and the Deathly Hallows: Part 2",
+        "The Sword in the Stone",
+        "Oz the Great and Powerful",
+        "The Lord of the Rings: The Fellowship of the Ring"
+      ]
+    },
+    {
+      "query": "superhero saves the world",
+      "relevant_docs": [
+        "The Incredibles",
+        "Superman II",
+        "Superman/Batman: Public Enemies",
+        "Justice League: The Flashpoint Paradox",
+        "Up, Up, and Away!",
+        "Megamind",
+        "Kick-Ass",
+        "Sky High"
+      ]
+    },
+    {
+      "query": "zombie apocalypse",
+      "relevant_docs": [
+        "Shaun of the Dead",
+        "Dance of the Dead",
+        "The Return of the Living Dead",
+        "Pride and Prejudice and Zombies",
+        "I Am Legend",
+        "Resident Evil: Apocalypse",
+        "Colin",
+        "Død snø"
+      ]
+    },
+    {
+      "query": "car racing",
+      "relevant_docs": [
+        "The Fast and the Furious",
+        "Rush",
+        "Need for Speed",
+        "Talladega Nights: The Ballad of Ricky Bobby",
+        "The Love Bug",
+        "Cars",
+        "Furious Seven"
+      ]
+    },
+    {
+      "query": "romantic comedy wedding",
+      "relevant_docs": [
+        "Runaway Bride",
+        "27 Dresses",
+        "Just Go with It",
+        "The Wedding Planner",
+        "Wedding Crashers",
+        "The Accidental Husband",
+        "You, Me and Dupree"
+      ]
+    }
+  ]
+}
