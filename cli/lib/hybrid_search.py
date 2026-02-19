@@ -1,5 +1,5 @@
 import os
-from lib.llm import augment_prompt
+from lib.llm import augment_prompt, llm_judge
 from lib.rerank import individual_rerank, batch_rerank, cross_encoder_rerank
 from .keyword_search import InvertedIndex
 from .semantic_search import ChunkedSemanticSearch
@@ -39,7 +39,7 @@ class HybridSearch:
         return combined_results[:limit]
 
     
-def rrf_search(query, k=60, limit=5, enhance=None, rerank_method=None, debug=None):
+def rrf_search(query, k=60, limit=5, enhance=None, rerank_method=None, debug=None, evaluate=None):
      if debug:
           print(f"Debugging for movie containing {debug}")
      movies = load_movies()
@@ -78,6 +78,8 @@ def rrf_search(query, k=60, limit=5, enhance=None, rerank_method=None, debug=Non
                     break
           print(f"DEBUG: Reranking Search post for {debug} is {idx if found else 'not found'}")
 
+     if evaluate: formatted_results=[]
+
      for idx, r in enumerate(results[:limit], start =1):
            print(f"{idx}. {r['title']}")
            print(f"RRF Score: {r['rrf_score']}")
@@ -85,6 +87,14 @@ def rrf_search(query, k=60, limit=5, enhance=None, rerank_method=None, debug=Non
                 print(f"Cross Encoder Score: {r['cross_encoder_score']}")
            print(f"BM25 Rank: {r['bm25_rank']}, Semantic Rank: {r['sem_rank']}")
            print(r['description'][:100])
+           print('-'*25)
+           if evaluate: formatted_results.append(f"<result id={idx}>{r['title']}: {r['description'][:100]}</result>")
+     
+     if evaluate:
+          llm_results = llm_judge(query, "\n".join(formatted_results))
+          
+          for idx, r in enumerate(results[:limit], start =1):
+               print(f"{idx}. {r['title']}: {llm_results[idx-1]}/3")
 
 def rrf_score(rank, k):
      return 1 / (rank + k)
