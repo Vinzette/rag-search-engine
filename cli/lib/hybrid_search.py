@@ -26,14 +26,22 @@ class HybridSearch:
         combined_results = combine_search_results(bm25_results, sem_results,alpha)
         return combined_results
     
-    def rrf_search(self, query, k, limit=10):
+    def rrf_search(self, query, k, limit=10,debug=None):
         bm25_results = self._bm25_search(query, limit*500)
         sem_results = self.semantic_search.search_chunks(query, limit*500) #cutting computation by searching not all docs
         combined_results = rrf_combine_search_results(bm25_results, sem_results, k)
+        if debug:
+             for r in combined_results:
+                  if debug.lower().strip() in r['title'].lower().strip():
+                       print(f"Phase 1 Search for {r['title']:}")
+                       print(f"{r['bm_25_rank']=} | {r['sem_rank']=}")
+                       print(r)
         return combined_results[:limit]
 
     
-def rrf_search(query, k=60, limit=5, enhance=None, rerank_method=None):
+def rrf_search(query, k=60, limit=5, enhance=None, rerank_method=None, debug=None):
+     if debug:
+          print(f"Debugging for movie containing {debug}")
      movies = load_movies()
      hs = HybridSearch(movies)
      if enhance:
@@ -43,6 +51,13 @@ def rrf_search(query, k=60, limit=5, enhance=None, rerank_method=None):
      rrf_limit = limit * 5 if rerank_method else 5
 
      results = hs.rrf_search(query, k, rrf_limit)
+     if debug:
+          found=False
+          for idx, r in enumerate(results):
+               if debug.lower().strip() in r['title'].lower().strip():
+                    found=True
+                    break
+          print(f"DEBUG: Hybrid Search post for {debug} is {idx if found else 'not found'}")
      match rerank_method:
           case "individual":
                results = individual_rerank(query, results) #take in query and previous results
@@ -55,6 +70,13 @@ def rrf_search(query, k=60, limit=5, enhance=None, rerank_method=None):
                print(f"Reranking top {limit} results using cross_encoder method...")
           case _:
                pass
+     if debug:
+          found=False
+          for idx, r in enumerate(results):
+               if debug.lower().strip() in r['title'].lower().strip():
+                    found=True
+                    break
+          print(f"DEBUG: Reranking Search post for {debug} is {idx if found else 'not found'}")
 
      for idx, r in enumerate(results[:limit], start =1):
            print(f"{idx}. {r['title']}")
