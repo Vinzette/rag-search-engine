@@ -38,11 +38,17 @@ def llm_judge(query, formatted_results):
     results = json.loads(results)
     return results
 
-def answer_question(query, documents):
-    with open(PROMPT_PATH/'answer_question.md', 'r') as f:
+def _rag(query, documents, prompt_fname):
+    with open(PROMPT_PATH/prompt_fname, 'r') as f:
         prompt = f.read()
     results = generate_content(prompt, query=query, docs=documents)
     return results
+
+def answer_question(query, documents):
+    return _rag(query, documents, 'answer_question.md')
+
+def summarize_documents(query, documents):
+    return _rag(query, documents, 'summarization.md')
 
 
     
