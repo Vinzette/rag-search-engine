@@ -11,4 +11,5 @@ dependencies = [
     "pillow>=12.1.1",
     "python-dotenv>=1.2.1",
     "sentence-transformers>=5.2.2",
+    "streamlit>=1.45.0",
 ]
