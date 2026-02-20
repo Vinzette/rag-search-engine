@@ -130,9 +130,7 @@ def describe_image_query(image_bytes, image_mime, query_text):
     ]
     response = client.models.generate_content(model=model, contents=parts)
     token_count = (
-        response.usage_metadata.total_token_count
-        if response.usage_metadata
-        else None
+        response.usage_metadata.total_token_count if response.usage_metadata else None
     )
     return response.text.strip(), token_count
 
@@ -198,7 +196,9 @@ if page == "Keyword Search":
     # ── build ────────────────────────────────────────────────────────────
     elif command == "build":
         st.subheader("Build inverted index")
-        st.caption("Builds the BM25 inverted index from movies.json and saves pickle files to `cache/`.")
+        st.caption(
+            "Builds the BM25 inverted index from movies.json and saves pickle files to `cache/`."
+        )
         if st.button("Build Index", type="primary"):
             with st.spinner("Building index…"):
                 idx = InvertedIndex()
@@ -368,7 +368,9 @@ elif page == "Semantic Search":
         st.subheader("Semantic text chunking (sentence-based)")
         text = st.text_area("Text to chunk")
         col1, col2 = st.columns(2)
-        max_chunk_size = col1.number_input("Max chunk size (sentences)", value=4, min_value=1)
+        max_chunk_size = col1.number_input(
+            "Max chunk size (sentences)", value=4, min_value=1
+        )
         overlap = col2.number_input("Overlap (sentences)", value=0, min_value=0)
         if st.button("Chunk", type="primary", disabled=not text):
             chunks = semantic_chunking(text, max_chunk_size, overlap)
@@ -379,7 +381,9 @@ elif page == "Semantic Search":
     # ── embed_chunks ─────────────────────────────────────────────────────
     elif command == "embed_chunks":
         st.subheader("Build / load chunk embeddings")
-        st.caption("Creates semantic chunk embeddings for all movies and saves to cache/.")
+        st.caption(
+            "Creates semantic chunk embeddings for all movies and saves to cache/."
+        )
         if st.button("Embed Chunks", type="primary"):
             with st.spinner("Building chunk embeddings…"):
                 movies = get_movies()
@@ -417,9 +421,7 @@ elif page == "Semantic Search":
 elif page == "Hybrid Search":
     st.header("⚡ Hybrid Search")
 
-    command = st.selectbox(
-        "Command", ["rrf-search", "weighted-search", "normalize"]
-    )
+    command = st.selectbox("Command", ["rrf-search", "weighted-search", "normalize"])
 
     # ── rrf-search ───────────────────────────────────────────────────────
     if command == "rrf-search":
@@ -430,7 +432,9 @@ elif page == "Hybrid Search":
         limit = col2.slider("Results to return", 1, 20, 5)
 
         col3, col4 = st.columns(2)
-        enhance = col3.selectbox("Query enhancement", [None, "spell", "rewrite", "expand"])
+        enhance = col3.selectbox(
+            "Query enhancement", [None, "spell", "rewrite", "expand"]
+        )
         rerank_method = col4.selectbox(
             "Re-rank method", [None, "individual", "batch", "cross_encoder"]
         )
@@ -461,7 +465,9 @@ elif page == "Hybrid Search":
                         found_pos = didx
                         break
                 if found_pos is not None:
-                    st.caption(f"🐛 DEBUG: **{debug}** found at position **{found_pos}** after hybrid search")
+                    st.caption(
+                        f"🐛 DEBUG: **{debug}** found at position **{found_pos}** after hybrid search"
+                    )
                 else:
                     st.caption(f"🐛 DEBUG: **{debug}** not found in hybrid results")
 
@@ -482,7 +488,9 @@ elif page == "Hybrid Search":
                             found_pos = didx
                             break
                     if found_pos is not None:
-                        st.caption(f"🐛 DEBUG: **{debug}** found at position **{found_pos}** after reranking")
+                        st.caption(
+                            f"🐛 DEBUG: **{debug}** found at position **{found_pos}** after reranking"
+                        )
                     else:
                         st.caption(f"🐛 DEBUG: **{debug}** not found after reranking")
 
@@ -501,7 +509,9 @@ elif page == "Hybrid Search":
                             f"<result id={i}>{r['title']}: {r.get('description', '')[:100]}</result>"
                             for i, r in enumerate(results, 1)
                         ]
-                        llm_results = llm_judge(actual_query, "\n".join(formatted_results))
+                        llm_results = llm_judge(
+                            actual_query, "\n".join(formatted_results)
+                        )
 
                     st.subheader("LLM Judge Scores")
                     for i, r in enumerate(results, 1):
@@ -532,7 +542,9 @@ elif page == "Hybrid Search":
     # ── normalize ────────────────────────────────────────────────────────
     elif command == "normalize":
         st.subheader("Normalize a list of scores")
-        scores_str = st.text_input("Scores (space-separated)", placeholder="0.5 1.2 3.7 0.1")
+        scores_str = st.text_input(
+            "Scores (space-separated)", placeholder="0.5 1.2 3.7 0.1"
+        )
         if st.button("Normalize", type="primary", disabled=not scores_str):
             try:
                 scores = [float(s) for s in scores_str.strip().split()]
@@ -556,9 +568,7 @@ elif page == "Hybrid Search":
 elif page == "RAG (Q&A)":
     st.header("🤖 Retrieval-Augmented Generation")
 
-    command = st.selectbox(
-        "Command", ["rag", "summarize", "citations", "question"]
-    )
+    command = st.selectbox("Command", ["rag", "summarize", "citations", "question"])
 
     query = st.text_input("Enter your question / query")
     limit = st.slider("Number of documents to retrieve", 1, 15, 5)
@@ -594,15 +604,17 @@ elif page == "RAG (Q&A)":
 elif page == "Image / Multimodal":
     st.header("🖼️ Image & Multimodal")
 
-    command = st.selectbox(
-        "Command", ["image_search", "describe_image"]
-    )
+    command = st.selectbox("Command", ["image_search", "describe_image"])
 
     # ── image_search ─────────────────────────────────────────────────────
     if command == "image_search":
         st.subheader("Image search (CLIP)")
-        st.caption("Upload an image and find the most similar movies using CLIP embeddings.")
-        uploaded = st.file_uploader("Upload an image", type=["png", "jpg", "jpeg", "webp"])
+        st.caption(
+            "Upload an image and find the most similar movies using CLIP embeddings."
+        )
+        uploaded = st.file_uploader(
+            "Upload an image", type=["png", "jpg", "jpeg", "webp"]
+        )
         limit = st.slider("Results to return", 1, 20, 5)
 
         if uploaded is not None:
@@ -631,13 +643,17 @@ elif page == "Image / Multimodal":
             "Upload an image and provide a text query. Gemini rewrites the query "
             "to improve movie database search by incorporating visual context."
         )
-        uploaded = st.file_uploader("Upload an image", type=["png", "jpg", "jpeg", "webp"])
+        uploaded = st.file_uploader(
+            "Upload an image", type=["png", "jpg", "jpeg", "webp"]
+        )
         query = st.text_input("Text query to go with the image")
 
         if uploaded is not None:
             st.image(uploaded, caption="Uploaded image", width=300)
 
-        if st.button("Rewrite Query", type="primary", disabled=(not uploaded or not query)):
+        if st.button(
+            "Rewrite Query", type="primary", disabled=(not uploaded or not query)
+        ):
             mime, _ = mimetypes.guess_type(uploaded.name)
             mime = mime or "image/jpeg"
             img_bytes = uploaded.getvalue()
