@@ -27,7 +27,7 @@ The pipeline covers:
 ### Installation
 
 ```bash
-git clone https://github.com/<your-username>/rag-search-engine.git
+git clone https://github.com/Vinzette/rag-search-engine.git
 cd rag-search-engine
 uv sync
 ```
@@ -37,6 +37,16 @@ Create a `.env` file in the project root:
 ```
 GEMINI_API_KEY=your_api_key_here
 ```
+
+### Download the dataset
+
+The `data/` directory (movies, golden dataset, stopwords) is not checked into git. Download it from the latest GitHub release:
+
+```bash
+bash download_data.sh
+```
+
+Or grab it manually from the [Releases page](https://github.com/Vinzette/rag-search-engine/releases).
 
 ### First-time setup
 
