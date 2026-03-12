@@ -37,7 +37,7 @@ def main() -> None:
 
     bm25search_parser = subparsers.add_parser("bm25search", help="Search movies using full BM25 scoring")
     bm25search_parser.add_argument("query", type=str, help="Search query")
-    bm25search_parser.add_argument("limit", type=float, nargs='?', default = 5, help="Top N Results")
+    bm25search_parser.add_argument("limit", type=int, nargs='?', default = 5, help="Top N Results")
 
     args = parser.parse_args()
 
@@ -47,7 +47,7 @@ def main() -> None:
             print(f"Searching for: {args.query}")
             results=search_command(args.query, 5)
             for i, result in enumerate(results):
-                print(f"{i} {result['title']}")
+                print(f"{i+1} {result['title']}")
         case "build":
             build_command()
         case "tf":
@@ -65,7 +65,7 @@ def main() -> None:
         case "bm25search":
             bm25_results = bm25_search(args.query, args.limit)
             for idx, res in enumerate(bm25_results):
-                print(f"{idx}. {res['doc_id']} {res['title']} - Score: {res['score']:.2f}")
+                print(f"{idx+1}. {res['doc_id']} {res['title']} - Score: {res['score']:.2f}")
             
         case _:
             parser.print_help()
