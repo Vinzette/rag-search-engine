@@ -9,7 +9,7 @@ api_key = os.environ.get("GEMINI_API_KEY")
 if not api_key:
     raise RuntimeError("GEMINI_API_KEY is not set")
 
-model='gemini-2.5-flash'
+model='gemini-3.1-flash-lite-preview'
 client = genai.Client(api_key=api_key)
 
 def augment_prompt(query, type):
